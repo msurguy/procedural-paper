@@ -1,0 +1,113 @@
+{
+  "name": "procedural-paper",
+  "version": "0.1.0",
+  "description": "Procedural paper textures and reusable paper components for the web, with vanilla JavaScript and React APIs.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./dom": {
+      "types": "./dist/dom.d.ts",
+      "import": "./dist/dom.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./composition": {
+      "types": "./dist/composition/index.d.ts",
+      "import": "./dist/composition/index.js"
+    },
+    "./composition/react": {
+      "types": "./dist/composition/react.d.ts",
+      "import": "./dist/composition/react.js"
+    },
+    "./composition/motion": {
+      "types": "./dist/composition/motion.d.ts",
+      "import": "./dist/composition/motion.js"
+    },
+    "./composition.css": "./dist/composition.css"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "licenses"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "keywords": [
+    "paper",
+    "texture",
+    "procedural",
+    "seamless",
+    "tileable",
+    "webgl",
+    "noise",
+    "normal-map"
+  ],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "node scripts/prepack.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^5.6.3",
+    "vite": "^6.4.5",
+    "vitest": "^4.1.12",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "jsdom": "^26.1.0",
+    "@chenglou/pretext": "0.0.9",
+    "brushmark": "0.1.2",
+    "tegaki": "1.1.0"
+  },
+  "author": "Maks Surguy",
+  "homepage": "https://msurguy.github.io/procedural-paper/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msurguy/procedural-paper.git",
+    "directory": "packages/paper"
+  },
+  "bugs": {
+    "url": "https://github.com/msurguy/procedural-paper/issues"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "@chenglou/pretext": "0.0.9",
+    "brushmark": "0.1.2",
+    "tegaki": "1.1.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "@chenglou/pretext": {
+      "optional": true
+    },
+    "brushmark": {
+      "optional": true
+    },
+    "tegaki": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

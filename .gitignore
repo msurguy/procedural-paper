@@ -1,0 +1,24 @@
+node_modules
+dist
+*.log
+.DS_Store
+*.tgz
+.playwright/
+private/
+references/
+originals/
+packages/paper/LICENSE
+packages/paper/THIRD_PARTY_NOTICES.md
+packages/paper/README.md
+packages/paper/licenses/
+test-results/
+playwright-report/
+
+# Local history, experiments, caches and credentials
+/archive/
+.pnpm-store/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+coverage/

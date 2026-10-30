@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Procedural Paper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="left">
+        <header class="brand">
+          <h1>Procedural Paper</h1>
+          <p>Seamless paper textures, generated</p>
+        </header>
+        <section class="block">
+          <h2>Tile</h2>
+          <div class="row">
+            <label>W <input id="w" type="number" min="16" max="16384" value="1024" /></label>
+            <span class="x">×</span>
+            <label>H <input id="h" type="number" min="16" max="16384" value="1024" /></label>
+          </div>
+          <div class="chips" id="sizes"></div>
+          <div class="row">
+            <label class="grow">Seed <input id="seed" type="number" min="0" max="999999" value="1" /></label>
+            <button id="dice" title="Random seed">Shuffle</button>
+          </div>
+        </section>
+        <section class="block presets">
+          <h2>Presets</h2>
+          <div id="presets"></div>
+        </section>
+      </aside>
+
+      <main class="stage">
+        <div class="toolbar">
+          <div class="seg" id="modes"></div>
+          <label class="check"><input type="checkbox" id="seams" /> Seams</label>
+          <label class="check"><input type="checkbox" id="blend" /> Blend over <input type="color" id="blendColor" value="#d97a7a" /></label>
+          <span class="spacer"></span>
+          <span class="stat" id="stat"></span>
+        </div>
+        <div class="viewport" id="viewport">
+          <div class="blendbg" id="blendbg"></div>
+          <canvas id="gl"></canvas>
+          <div class="hint">Drag to pan · Scroll to zoom · Double-click to reset</div>
+        </div>
+      </main>
+
+      <aside class="right">
+        <div class="export">
+          <h2>Export</h2>
+          <div class="chips" id="exportMaps"></div>
+          <div class="row">
+            <button class="primary" id="download">Download PNG</button>
+          </div>
+          <div class="row">
+            <button id="downloadJson">Save JSON</button>
+            <button id="copyJson">Copy params</button>
+            <button id="copyCode">Copy code</button>
+            <button id="copyLink">Copy link</button>
+          </div>
+        </div>
+        <div id="controls"></div>
+        <details class="group debug">
+          <summary>Debug</summary>
+          <div class="fields">
+            <button id="parity">GPU vs CPU parity (256²)</button>
+            <pre id="parityOut"></pre>
+          </div>
+        </details>
+      </aside>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script type="module" src="/src/exporter/main.ts"></script>
+  </body>
+</html>

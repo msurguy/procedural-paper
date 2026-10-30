@@ -1,0 +1,10 @@
+EMS Casual Hand
+
+Font name:               EMS Casual Hand
+License:                 SIL Open Font License http://scripts.sil.org/OFL
+Created by:              Sheldon B. Michaels
+SVG font conversion by:  Windell H. Oskay
+A derivative of:         Covered By Your Grace
+Designer:                Kimberly Geswein, Kimberly Geswein Fonts
+Link:                    http://www.kimberlygeswein.com/
+Google font page:        https://fonts.google.com/specimen/Covered+By+Your+Grace

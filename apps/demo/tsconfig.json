@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "vite/client"
+    ],
+    "paths": {
+      "procedural-paper": [
+        "../../packages/paper/src/index.ts"
+      ],
+      "procedural-paper/dom": [
+        "../../packages/paper/src/dom.ts"
+      ],
+      "procedural-paper/composition": [
+        "../../packages/paper/src/composition/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}

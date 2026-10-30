@@ -1,0 +1,287 @@
+:root {
+  --bar: rgba(24, 23, 22, 0.82);
+  --bar-line: rgba(255, 255, 255, 0.1);
+  --text: #f1ede4;
+  --muted: #b3aea3;
+  --accent: #f0c75e;
+  --accent-ink: #1d1a14;
+  --desk: #6b5038;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background-color: var(--desk);
+  background-attachment: local;
+  color: var(--text);
+  font: 13px/1.4 Inter, system-ui, sans-serif;
+  overflow-x: hidden;
+}
+button, select, input { font: inherit; color: inherit; }
+
+/* ------------------------------------------------------------- toolbar */
+.bar {
+  position: fixed; z-index: 100000; top: 12px; left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: calc(100vw - 24px);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding: 8px 12px; border-radius: 14px;
+  background: var(--bar); border: 1px solid var(--bar-line);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+.brand { display: flex; flex-direction: column; line-height: 1.15; margin-right: 4px; }
+.brand b { font-weight: 600; font-size: 14px; }
+.brand span { color: var(--muted); font-size: 11px; }
+.bar button { background: rgba(255, 255, 255, 0.07); border: 1px solid var(--bar-line); border-radius: 8px; padding: 6px 11px; cursor: pointer; }
+.bar button:hover { background: rgba(255, 255, 255, 0.13); }
+.bar button.on { background: rgba(240, 199, 94, 0.22); border-color: rgba(240, 199, 94, 0.5); }
+.bar button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.seg { display: inline-flex; padding: 2px; border-radius: 9px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--bar-line); }
+.seg button { border: 0 !important; background: transparent !important; padding: 4px 10px !important; color: var(--muted); border-radius: 7px !important; }
+.seg button.on { background: var(--text) !important; color: #1b1a17; }
+.ctl { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); }
+.ctl select { background: rgba(255, 255, 255, 0.07); border: 1px solid var(--bar-line); border-radius: 8px; padding: 5px 6px; color: var(--text); }
+.ctl select option { background: #222; }
+.ctl input[type='range'] { width: 90px; accent-color: var(--accent); }
+.ctl output { font: 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--text); min-width: 26px; }
+.stat { font: 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); }
+.pop { position: relative; }
+.menu {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 2; min-width: 210px;
+  background: #1f1e1c; border: 1px solid var(--bar-line); border-radius: 10px; padding: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: grid; gap: 2px;
+}
+.menu[hidden] { display: none; }
+.menu label { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+.menu label:hover { background: rgba(255, 255, 255, 0.06); }
+.menu .row { display: flex; gap: 6px; margin-top: 6px; }
+.menu .row button { flex: 1; font-size: 12px; }
+
+/* ------------------------------------------------------------- desk */
+.desk { position: relative; width: 100%; min-height: 100vh; overflow: clip; perspective: 2600px; }
+.desk.mat {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: 30px 30px;
+}
+
+/* Pegboard holes are drawn over its generated texture. Wood uses scanned grain. */
+.desk.pegs {
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(20, 12, 4, 0.78) 0 3.4px, rgba(20, 12, 4, 0.35) 4px, transparent 4.6px),
+    radial-gradient(circle at 50.6% 51.6%, rgba(255, 255, 255, 0.25) 0 4.4px, transparent 5px);
+  background-size: 25.4px 25.4px;
+}
+
+.card {
+  position: absolute; left: 0; top: 0;
+  transition: left 0.7s cubic-bezier(.2, .8, .2, 1), top 0.7s cubic-bezier(.2, .8, .2, 1), transform 0.7s cubic-bezier(.2, .8, .2, 1);
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+  opacity: 0;
+}
+.card.ready { animation: drop 0.45s cubic-bezier(.2, .8, .2, 1) both; opacity: 1; }
+@keyframes drop { from { opacity: 0; scale: 1.05; } }
+/* peel.ts drives the transform while .live: no transitions, layers promoted */
+.card.live, .prop.live { cursor: grabbing; transition: none; will-change: transform; }
+.live .shadow, .live .sheen, .live .front canvas { will-change: transform, opacity; }
+.shadow { position: absolute; inset: 0; pointer-events: none; transform-origin: 50% 50%; }
+.shadow canvas { position: absolute; max-width: none; }
+.shadow canvas.lifted { opacity: 0; }
+.sheen { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: soft-light; }
+.prop .shadow canvas.lifted { opacity: 0; }
+
+/* attachment sprites coming off and going back on */
+.front canvas.prop-sprite { transition: transform 0.18s cubic-bezier(.2, .8, .2, 1), opacity 0.18s; }
+.front canvas.prop-sprite.popped { transform: scale(1.5) translateY(-6px); opacity: 0; }
+.front canvas.prop-sprite.push { animation: push 0.22s cubic-bezier(.2, .9, .3, 1.2) both; }
+@keyframes push { from { transform: scale(1.35) translateY(-5px); } }
+/* a pin lifted out of the way of a card passing over it */
+.pins-up { position: absolute; inset: 0; z-index: 95000; pointer-events: none; }
+.pins-up canvas { position: absolute; max-width: none; }
+canvas.prop-sprite { transition: transform 0.18s cubic-bezier(.2, .8, .2, 1); }
+canvas.prop-sprite.up { transform: scale(1.3) translateY(-9px); }
+.prop.up .shadow { transform: translate(5px, 8px) scale(1.04); transition: transform 0.18s; }
+.prop.up .shadow canvas.lifted { opacity: 0.7; transition: opacity 0.18s; }
+.prop .shadow canvas.lifted { transition: opacity 0.18s; }
+
+/* what a desk remembers: pin holes and coffee rings */
+.mark { position: absolute; z-index: 0; pointer-events: none; }
+.mark.hole { width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.45) 60%, transparent 70%); box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.18); }
+.mark.ring { mix-blend-mode: multiply; }
+.mark.ring svg { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .front canvas.prop-sprite { transition: none; }
+  .card.ready { animation: none; }
+}
+.card.selected .paper { filter: drop-shadow(0 0 1.5px var(--accent)) drop-shadow(0 0 1.5px var(--accent)); }
+
+.back, .front, .paper { position: absolute; inset: 0; pointer-events: none; }
+.paper { isolation: isolate; }
+.paper :is(canvas, img), .back :is(canvas, img), .front :is(canvas, img) { position: absolute; pointer-events: none; max-width: none; }
+.paper :is(canvas, img).shade { mix-blend-mode: hard-light; }
+.front :is(canvas, img).tape { transform-origin: 50% 50%; }
+
+/* pickup curl: the card's layers hide and a strip copy bends instead (curl.ts) */
+.card.curling > :is(.back, .paper, .front) { visibility: hidden; }
+.curl { position: absolute; pointer-events: none; perspective: 2200px; transform-origin: 50% 50%; }
+.strip { position: absolute; left: 0; width: 100%; overflow: hidden; transform-origin: 0 0; will-change: transform; backface-visibility: hidden; }
+.strip-in { position: absolute; inset: 0; }
+.sheet-copy { position: absolute; transform-origin: 50% 50%; }
+.sheet-copy > .paper, .sheet-copy > .back, .sheet-copy > .front { position: absolute; inset: 0; }
+.strip-light { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.layer { position: absolute; inset: 0; }
+.adhesive { position: absolute; left: 0; right: 0; top: 0; height: 18%; background: linear-gradient(rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.012)); mix-blend-mode: multiply; }
+.print, .postmark { position: absolute; mix-blend-mode: multiply; }
+.postmark { opacity: 0.55; filter: url(#f-stamp); }
+
+.prop { position: absolute; cursor: grab; touch-action: none; user-select: none; pointer-events: none; }
+.prop canvas { position: absolute; inset: 0; pointer-events: none; }
+/* only the object's own outline takes the pointer (render.ts hitShape), not the box around it and its shadow */
+.prop-hit { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.prop-hit path { fill: transparent; pointer-events: fill; }
+.desk.grid .prop { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.desk.grid .prop-hit path { pointer-events: none; }
+
+.ink { position: absolute; mix-blend-mode: multiply; overflow-wrap: anywhere; }
+.ink.light { mix-blend-mode: normal; opacity: 0.92; }
+.ink .t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.ink .done { text-decoration: line-through; opacity: 0.75; }
+/* brushed-on underlines and strike-throughs (motion.ts) replace the CSS decorations */
+.ink .t.nodeco, .ink .done.nodeco { text-decoration: none; }
+/* content motion: layers promoted only while a card's timeline is playing */
+.card.motion [data-mv] { will-change: transform, opacity; }
+.ink .r { text-align: right; }
+.ink .dim { opacity: 0.8; }
+.ink .num { color: #a02424; }
+.ink.fit { overflow: visible; }
+.ink.typed span.w { white-space: nowrap; }
+/* Tegaki pen host (handwriting.ts): the engine's transparent text keeps the block's flow */
+.ink .pen { display: block; }
+.ink.typed span span { position: relative; }
+
+.doodle { position: absolute; mix-blend-mode: multiply; pointer-events: none; }
+.doodle svg { display: block; overflow: visible; }
+.paint { position: absolute; inset: 0; mix-blend-mode: multiply; }
+.stain { position: absolute; mix-blend-mode: multiply; pointer-events: none; }
+
+/* rulings */
+.rules { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; }
+.rules.index { top: 37.5px; background: repeating-linear-gradient(180deg, transparent 0 18.8px, rgba(92, 140, 206, 0.42) 18.8px 20px); }
+.rules.index::before { content: ''; position: absolute; left: 0; right: 0; top: -1.5px; height: 1.5px; background: rgba(214, 74, 82, 0.6); }
+.rules.notebook {
+  background:
+    linear-gradient(90deg, transparent 38px, rgba(214, 74, 82, 0.5) 38px, rgba(214, 74, 82, 0.5) 39.3px, transparent 39.3px),
+    repeating-linear-gradient(180deg, transparent 0, transparent 20.8px, rgba(92, 140, 206, 0.38) 20.8px, rgba(92, 140, 206, 0.38) 22px) 0 34px / 100% 22px repeat-y;
+}
+.rules.dots { background: radial-gradient(circle, rgba(90, 90, 100, 0.45) 1px, transparent 1.4px) 6px 8px / 22px 22px; }
+.rules.graph {
+  --g: 60, 140, 120;
+  background:
+    linear-gradient(rgba(var(--g), 0.4) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(90deg, rgba(var(--g), 0.4) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(rgba(var(--g), 0.2) 1px, transparent 1px) 0 0 / 10px 10px,
+    linear-gradient(90deg, rgba(var(--g), 0.2) 1px, transparent 1px) 0 0 / 10px 10px;
+}
+
+/* napkin, tag */
+.emboss { position: absolute; inset: 9px; border: 3px dotted rgba(0, 0, 0, 0.05); border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); pointer-events: none; }
+
+/* receipt */
+.receipt .c { text-align: center; }
+.receipt .b { font-weight: 700; }
+.receipt .li { display: flex; justify-content: space-between; gap: 8px; }
+.receipt .hr { border-top: 1px dashed currentColor; margin: 7px 0; opacity: 0.6; }
+.barcode { margin: 12px auto 0; opacity: 0.9; }
+
+/* business card */
+.biz { display: flex; flex-direction: column; justify-content: flex-end; }
+.biz.press { text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); }
+.biz .nm { }
+.biz .rl { opacity: 0.8; }
+.biz .ct { opacity: 0.7; }
+.mono-mark { width: 34px; height: 34px; border: 1.5px solid currentColor; display: grid; place-items: center; font-weight: 700; font-size: 1.1em; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* clipping */
+.news .hl { font-size: 1.85em; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; }
+.news .by { margin: 6px 0 8px; padding-bottom: 6px; border-bottom: 1px solid currentColor; font-size: 0.85em; opacity: 0.8; }
+.news .cols { columns: 2; column-gap: 12px; text-align: justify; hyphens: auto; line-height: 1.32; opacity: 0.88; }
+
+/* grid captions */
+.cap {
+  position: absolute; left: 50%; top: calc(100% + 12px); transform: translateX(-50%); text-align: center;
+  font: 10.5px/1.4 'JetBrains Mono', ui-monospace, monospace; color: #f4f1ea;
+  background: rgba(20, 19, 18, 0.62); padding: 3px 9px; border-radius: 8px;
+  opacity: 0; transition: opacity 0.4s; pointer-events: none; width: max-content; max-width: calc(100% + 44px);
+}
+.cap i { font-style: normal; color: rgba(244, 241, 234, 0.65); }
+.desk.grid .cap { opacity: 1; }
+.desk.no-caps .cap { display: none; }
+
+/* ------------------------------------------------------------- overlays */
+.inspect {
+  position: fixed; z-index: 100000; left: 14px; bottom: 14px; width: 280px; padding: 12px 14px;
+  background: var(--bar); border: 1px solid var(--bar-line); border-radius: 12px;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+.inspect[hidden] { display: none; }
+.inspect .ttl { font-weight: 600; font-size: 14px; }
+.inspect dl { display: grid; grid-template-columns: 48px 1fr; gap: 4px 8px; margin: 8px 0 10px; }
+.inspect dt { color: var(--muted); }
+.inspect dd { margin: 0; font: 11.5px 'JetBrains Mono', ui-monospace, monospace; overflow-wrap: anywhere; }
+.inspect .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.inspect button { flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--bar-line); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+.inspect button:hover { background: rgba(255, 255, 255, 0.14); }
+.hint { position: fixed; right: 14px; bottom: 14px; z-index: 99999; font-size: 11px; color: rgba(255, 255, 255, 0.85); background: rgba(0, 0, 0, 0.4); padding: 4px 10px; border-radius: 999px; pointer-events: none; }
+.toast { position: fixed; z-index: 100001; bottom: 20px; left: 50%; transform: translate(-50%, 20px); background: var(--text); color: #1b1a17; padding: 7px 14px; border-radius: 999px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.18s, transform 0.18s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 720px) {
+  .bar { top: 8px; gap: 8px; padding: 8px; }
+  .brand span, .hint { display: none; }
+  .ctl input[type='range'] { width: 70px; }
+  .inspect { left: 8px; right: 8px; bottom: 8px; width: auto; }
+}
+
+/* ------------------------------------------------------------- motion timeline (debug) */
+.tl { position: fixed; z-index: 100002; left: 0; right: 0; bottom: 0; height: 260px; display: flex; background: rgba(18, 17, 16, 0.94); border-top: 1px solid var(--bar-line); backdrop-filter: blur(10px); font-size: 12px; }
+.tl[hidden] { display: none; }
+.tl-side { width: 300px; border-right: 1px solid var(--bar-line); display: flex; flex-direction: column; }
+.tl-head { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--bar-line); }
+.tl-dim { color: var(--muted); }
+.tl-list { overflow: auto; flex: 1; }
+.tl-row { padding: 6px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.tl-row:hover { background: rgba(255, 255, 255, 0.05); }
+.tl-row.on { background: rgba(240, 199, 94, 0.14); }
+.tl-row span { color: var(--muted); font: 11px 'JetBrains Mono', ui-monospace, monospace; }
+.tl-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.tl-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 6px 10px; border-bottom: 1px solid var(--bar-line); }
+.tl-bar button { background: rgba(255, 255, 255, 0.07); border: 1px solid var(--bar-line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.tl-bar button:hover { background: rgba(255, 255, 255, 0.13); }
+.tl-bar label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.tl-bar select { background: rgba(255, 255, 255, 0.07); border: 1px solid var(--bar-line); border-radius: 6px; padding: 3px 6px; color: var(--text); }
+.tl-bar select option { background: #222; }
+.tl-bar input[type='range'] { width: 90px; accent-color: var(--accent); }
+.tl-bar output { font: 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--text); }
+.tl-readout { font: 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--text); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+.tl-plot { flex: 1; width: 100%; min-height: 0; cursor: col-resize; touch-action: none; }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 10px; color: var(--muted); font-size: 11px; }
+.tl-legend i { display: inline-block; width: 10px; height: 10px; margin-right: 4px; vertical-align: -1px; }
+body:has(.tl:not([hidden])) .inspect, body:has(.tl:not([hidden])) .hint { bottom: 274px; }
+
+/* photos printed on a card (photos.ts): canvases in the ink layer, under the sheet's shade */
+.layer canvas.photo { position: absolute; }
+/* instant film: a murky overlay that only shows while the photo develops (motion.ts `develop`) */
+.develop { position: absolute; opacity: 0; background: linear-gradient(160deg, #3c4a4b, #2c3537 60%, #4a4a3e); pointer-events: none; }
+/* the window of an instant print sits a hair below the frame */
+.photo-edge { position: absolute; pointer-events: none; box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.35), inset 0.6px 1px 1.5px rgba(0, 0, 0, 0.35); }
+/* the target a grease-pencil mark goes around */
+.pick { position: absolute; pointer-events: none; }
+/* album photo corners (html attachments) */
+.photo-corner { position: absolute; width: 0; height: 0; pointer-events: none; }
+.photo-corner svg { position: absolute; left: -4px; top: -4px; overflow: visible; filter: drop-shadow(0.6px 1.2px 0.8px rgba(0, 0, 0, 0.45)); }
+/* handwriting on a tape label laid over a print */

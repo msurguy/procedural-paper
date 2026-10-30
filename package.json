@@ -1,0 +1,22 @@
+{
+  "name": "procedural-paper-monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter demo dev",
+    "build": "pnpm --filter procedural-paper build && pnpm --filter demo build",
+    "test": "pnpm --filter procedural-paper test",
+    "typecheck": "pnpm -r typecheck",
+    "desk": "pnpm --filter demo dev --open /?tab=desk",
+    "preview": "pnpm --filter demo preview",
+    "check:package": "node scripts/check-package.mjs",
+    "test:browser": "playwright test"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

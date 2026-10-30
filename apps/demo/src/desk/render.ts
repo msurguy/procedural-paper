@@ -1,0 +1,13 @@
+import { capturePrepared } from './composition-capture';
+import { createSceneRenderer } from '../../../../packages/paper/src/composition/renderer';
+import { getRenderer, textureScale } from './papers';
+import { runPhotos, preloadPhotos, renderPhoto, loadPhoto } from './photos';
+export type { BuiltCard, BuiltProp, Holder, HolderKind, HolderPoint, Thickness } from '../../../../packages/paper/src/composition/renderer';
+export const LIGHT = { azimuth: 225, elevation: 48 };
+let context: ReturnType<typeof createSceneRenderer> | undefined;
+const scene = () => context ??= createSceneRenderer({ renderer: getRenderer(), light: LIGHT, onPrepared: (plan, built, angle) => capturePrepared(plan, built, angle, textureScale, LIGHT), grain: () => textureScale, photos: { runPhotos, preloadPhotos, renderPhoto, loadPhoto, dispose() {} } });
+export const dpr = () => Math.min(2, window.devicePixelRatio || 1);
+export const shadowDir = () => scene().shadowDir();
+export const grainParams: ReturnType<typeof createSceneRenderer>['grainParams'] = (...args) => scene().grainParams(...args);
+export const buildCard: ReturnType<typeof createSceneRenderer>['buildCard'] = (...args) => scene().buildCard(...args);
+export const buildProp: ReturnType<typeof createSceneRenderer>['buildProp'] = (...args) => scene().buildProp(...args);

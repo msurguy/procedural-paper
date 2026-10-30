@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paper Desk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <!-- shared ink / paint filters -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="f-ink" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="1.4" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <filter id="f-pencil" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="9" result="n" />
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  2.4 0 0 0 -0.55" result="m" />
+        <feComposite in="SourceGraphic" in2="m" operator="in" result="g" />
+        <feDisplacementMap in="g" in2="n" scale="1" xChannelSelector="G" yChannelSelector="B" />
+      </filter>
+      <filter id="f-stamp" x="-5%" y="-10%" width="110%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="3" seed="2" result="n" />
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3.2 0 0 0 -0.75" result="m" />
+        <feComposite in="SourceGraphic" in2="m" operator="in" result="g" />
+        <feDisplacementMap in="g" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <filter id="f-wash" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="g" />
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.2 0 0 0 0.25" result="ga" />
+        <feComposite in="d" in2="ga" operator="in" />
+      </filter>
+      <filter id="f-stain" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="11" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <header class="bar">
+      <div class="brand"><b>Paper Desk</b><span>procedural paper · seamless tiles</span></div>
+      <button id="shuffle" class="primary" title="New desk (R)">Shuffle</button>
+      <div class="seg" id="layout">
+        <button data-v="scatter">Scatter</button>
+        <button data-v="grid">Grid</button>
+      </div>
+      <div class="seg" id="mood">
+        <button data-v="mix">Mixed</button>
+        <button data-v="hand">Handwritten</button>
+        <button data-v="mono">Typed</button>
+      </div>
+      <label class="ctl">Desk <select id="desk"></select></label>
+      <label class="ctl">Cards <input id="count" type="range" min="6" max="80" step="1" /><output id="countOut"></output></label>
+      <label class="ctl">Grain <input id="grain" type="range" min="0.4" max="1.4" step="0.05" /><output id="grainOut"></output></label>
+      <label class="ctl">Attach <input id="attach" type="range" min="0" max="1" step="0.05" /><output id="attachOut"></output></label>
+      <label class="ctl">Light <input id="light" type="range" min="0" max="360" step="5" /><output id="lightOut"></output></label>
+      <label class="ctl check"><input id="props" type="checkbox" /> Props</label>
+      <label class="ctl check" title="Captions under each card in grid layout"><input id="labels" type="checkbox" /> Labels</label>
+      <label class="ctl check"><input id="motion" type="checkbox" /> Motion</label>
+      <label class="ctl check" title="Draw handwriting stroke by stroke with Tegaki (loads on demand)"><input id="pen" type="checkbox" /> Pen</label>
+      <label class="ctl" id="penFontCtl" hidden><select id="penFont" title="Pen font: match each card's face, or set every handwritten card in one stroke font"></select></label>
+      <button id="replay" title="Replay the content motion on every card (M)">Replay</button>
+      <div class="pop">
+        <button id="kindsBtn">Types ▾</button>
+        <div class="menu" id="kinds" hidden></div>
+      </div>
+      <span class="stat" id="stat"></span>
+    </header>
+
+    <main id="desk-area" class="desk"></main>
+
+    <aside id="inspect" class="inspect" hidden>
+      <div class="ttl" id="iKind"></div>
+      <dl>
+        <dt>Paper</dt><dd id="iPaper"></dd>
+        <dt>Fonts</dt><dd id="iFonts"></dd>
+        <dt>Held by</dt><dd id="iAttach"></dd>
+      </dl>
+      <div class="row">
+        <button id="iReroll" title="Double-click a card does the same">Re-roll</button>
+        <button id="iCopy">Copy sheet code</button>
+        <button id="iVanilla">Export Vanilla</button><button id="iReact">Export React</button>
+      </div>
+      <p>Export this exact component with its paper, content, photos, attachments and animations.</p>
+    </aside>
+
+    <div class="hint">drag anything · flick to throw · double-click a card to re-roll · R shuffle · G grid · M replay motion · T timeline</div>
+    <div class="toast" id="toast"></div>
+    <script type="module" src="/src/desk/main.ts"></script>
+  </body>
+</html>
