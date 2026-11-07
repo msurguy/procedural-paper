@@ -1,0 +1,62 @@
+name: Publish to npm
+# Publishes packages/paper whenever main declares a version that npm doesn't
+# have yet (normally after merging a PR made by `pnpm release`), then tags the
+# commit and creates a GitHub release from the CHANGELOG entry.
+#
+# Auth: npm trusted publishing (OIDC). One-time setup on npmjs.com:
+#   procedural-paper → Settings → Trusted Publisher → GitHub Actions,
+#   user msurguy, repository procedural-paper, workflow publish.yml.
+# (Alternatively add an NPM_TOKEN repository secret; it is used when present.)
+on:
+  push:
+    branches: [main]
+    paths: [packages/paper/package.json]
+  workflow_dispatch:
+permissions:
+  contents: write # push the version tag and create the GitHub release
+  id-token: write # npm trusted publishing + provenance
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Check whether this version is new
+        id: version
+        run: |
+          version=$(node -p "require('./packages/paper/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if npm view "procedural-paper@$version" version >/dev/null 2>&1; then
+            echo "procedural-paper@$version is already on npm; nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.publish == 'true'
+        run: npm install -g npm@11 # trusted publishing needs npm 11.5.1+
+      - if: steps.version.outputs.publish == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.version.outputs.publish == 'true'
+        run: pnpm typecheck && pnpm test && pnpm check:package
+      - name: Publish
+        if: steps.version.outputs.publish == 'true'
+        working-directory: packages/paper
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Tag and create GitHub release
+        if: steps.version.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md
