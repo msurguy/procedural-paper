@@ -35,8 +35,9 @@ pnpm preview
 
 ## Use the library
 
-The package is prepared for npm publication. Until published, build and run
-`pnpm --filter procedural-paper pack`, then install the resulting tarball in your app.
+```sh
+npm install procedural-paper
+```
 
 ```ts
 import { generatePaper, toBlob } from 'procedural-paper';
