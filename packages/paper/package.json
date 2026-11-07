@@ -33,7 +33,8 @@
       "types": "./dist/composition/motion.d.ts",
       "import": "./dist/composition/motion.js"
     },
-    "./composition.css": "./dist/composition.css"
+    "./composition.css": "./dist/composition.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -52,7 +53,11 @@
     "tileable",
     "webgl",
     "noise",
-    "normal-map"
+    "normal-map",
+    "react",
+    "components",
+    "ui",
+    "generative"
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",

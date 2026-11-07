@@ -1,6 +1,13 @@
 # procedural-paper API
 
-MIT © 2026 Maks Surguy. [Source and demo](https://github.com/msurguy/procedural-paper).
+MIT © 2026 Maks Surguy. [Source](https://github.com/msurguy/procedural-paper) · [Demo](https://msurguy.github.io/procedural-paper/)
+
+Seamless procedural paper textures and 25 paper UI components, generated from
+code without source images.
+
+```sh
+npm install procedural-paper
+```
 
 ## Entry points
 
@@ -143,8 +150,7 @@ Choose a file to copy, or download the ZIP to get the complete example.
 The ZIP contains both framework examples, `composition.json`, a static asset
 resolver, selected local photographs and fonts, optional pen data, credits and
 licenses, and a small Vite application. Run `npm install` then `npm run dev` in
-that folder. Until the package is published, install a locally built/packed
-`packages/paper` instead of the registry version. Assets work without Google
+that folder. Assets work without Google
 Fonts or other external services; installing dependencies still requires an
 available package source.
 
